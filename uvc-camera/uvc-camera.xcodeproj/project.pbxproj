@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		F122C31E2697925F00A199D1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F122C31D2697925F00A199D1 /* main.cpp */; };
 		F191B4E62697C80B007B97D7 /* libuvc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F191B4E52697C80B007B97D7 /* libuvc.a */; };
+		F1EA25E92698E73C0062F04F /* brad_example.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1EA25E82698E73C0062F04F /* brad_example.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,10 @@
 		F122C31D2697925F00A199D1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F191B4E52697C80B007B97D7 /* libuvc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuvc.a; path = ../../../../../usr/local/lib/libuvc.a; sourceTree = "<group>"; };
 		F1EA25DC2698C4510062F04F /* uvc-camera.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "uvc-camera.entitlements"; sourceTree = "<group>"; };
+		F1EA25DE2698D87A0062F04F /* BmpInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BmpInfo.h; sourceTree = "<group>"; };
+		F1EA25DF2698D87A0062F04F /* MyImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyImage.h; sourceTree = "<group>"; };
+		F1EA25E12698D87A0062F04F /* IImageBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IImageBuffer.h; sourceTree = "<group>"; };
+		F1EA25E82698E73C0062F04F /* brad_example.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = brad_example.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +69,10 @@
 			children = (
 				F1EA25DC2698C4510062F04F /* uvc-camera.entitlements */,
 				F122C31D2697925F00A199D1 /* main.cpp */,
+				F1EA25DE2698D87A0062F04F /* BmpInfo.h */,
+				F1EA25E12698D87A0062F04F /* IImageBuffer.h */,
+				F1EA25DF2698D87A0062F04F /* MyImage.h */,
+				F1EA25E82698E73C0062F04F /* brad_example.cpp */,
 			);
 			path = "uvc-camera";
 			sourceTree = "<group>";
@@ -133,6 +142,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F122C31E2697925F00A199D1 /* main.cpp in Sources */,
+				F1EA25E92698E73C0062F04F /* brad_example.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -190,13 +200,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					/usr/local/include/opencv4,
-				);
+				HEADER_SEARCH_PATHS = "";
 				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "";
+				"LIBRARY_SEARCH_PATHS[arch=*]" = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -251,12 +258,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					/usr/local/include/opencv4,
-				);
+				HEADER_SEARCH_PATHS = "";
 				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -273,8 +277,14 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = NC5A977249;
 				ENABLE_HARDENED_RUNTIME = YES;
-				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/Cellar/opencv/4.5.3/include/opencv4,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					/usr/local/Cellar/opencv/4.5.3/lib/opencv4,
+				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.canon.cusa.uvc-camera";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -291,8 +301,14 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = NC5A977249;
 				ENABLE_HARDENED_RUNTIME = YES;
-				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/Cellar/opencv/4.5.3/include/opencv4,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/Cellar/opencv/4.5.3/lib/opencv4,
+				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.canon.cusa.uvc-camera";
 				PRODUCT_NAME = "$(TARGET_NAME)";

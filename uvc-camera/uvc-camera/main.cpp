@@ -12,6 +12,17 @@
 #include "libuvc/libuvc.h"
 #include <stdio.h>
 #include <unistd.h>
+#include "MyImage.h"
+#include "BmpInfo.h"
+#include "IImageBuffer.h"
+#include <iostream>
+
+//#include <opencv2/opencv.hpp>
+//#include <opencv2/highgui.hpp>
+//#include <opencv2/core.hpp>
+//#include <opencv2/core/core_c.h>
+//#include <opencv2/core/types_c.h>
+//#include <opencv2/highgui/highgui_c.h>
 
 /* This callback function runs once per frame. Use it to perform any
  * quick processing you need, or have it put the frame into your application's
@@ -34,7 +45,7 @@ void cb(uvc_frame_t *frame, void *ptr) {
   }
 
     printf("callback! frame_format = %d, width = %d, height = %d, length = %zu, ptr = %zu\n",
-    frame->frame_format, frame->width, frame->height, frame->data_bytes, ptr);
+           frame->frame_format, frame->width, frame->height, frame->data_bytes, (size_t)ptr); // RS
 
   switch (frame->frame_format) {
   /*
@@ -73,6 +84,28 @@ void cb(uvc_frame_t *frame, void *ptr) {
   if (frame->sequence % 30 == 0) {
     printf(" * got image %u\n",  frame->sequence);
   }
+
+    // Use Brad's function to save a single frame
+    MyImage im(640, 480);
+    BYTE *pData = im.grabWrite();
+    
+    // Process one frame
+    for (int row = 0 ; row < im.getInfo().size.h ; row++) {  // rows from bottom
+        int destRow = im.getInfo().size.h - 1 - row; // Opposite direction for flipping the image
+        for (int col = 0 ; col < im.getInfo().size.w ; col++) { // columns from left
+            for (int rgb = 0; rgb < im.getInfo().BPP; rgb++) { // R,G,B
+                //pData[j*im.getInfo().stride + i * im.getInfo().BPP + c] = myImagebyte;
+                pData[destRow * im.getInfo().stride + col * im.getInfo().BPP + rgb] = *((char *)frame->data
+                                                                            + (row * im.getInfo().size.w * im.getInfo().BPP) // Offset to the row
+                                                                            + (col * im.getInfo().BPP)                       // Offset to the column
+                                                                            + rgb);                                         // Offset to the byte
+            }
+        }
+    }
+    
+    im.release(pData);
+    std::string filename = "frame_" + std::to_string(frame->sequence) + ".bmp";
+    im.Save(filename.c_str());
 
   /* Call a user function:
    *
@@ -158,9 +191,9 @@ int main(int argc, char **argv) {
       case UVC_VS_FORMAT_MJPEG:
         frame_format = UVC_COLOR_FORMAT_MJPEG;
         break;
-      case UVC_VS_FORMAT_FRAME_BASED:
-        //frame_format = UVC_FRAME_FORMAT_H264;
-        break;
+      //case UVC_VS_FORMAT_FRAME_BASED:
+      //  frame_format = UVC_FRAME_FORMAT_H264;
+      //  break;
       default:
         frame_format = UVC_FRAME_FORMAT_YUYV;
         break;
@@ -218,7 +251,7 @@ int main(int argc, char **argv) {
             uvc_perror(res, " ... uvc_set_ae_mode failed to enable auto exposure mode");
           }
 
-          sleep(10); /* stream for 10 seconds */
+          sleep(1); /* stream for 1 second */
 
           /* End the stream. Blocks until last callback is serviced */
           uvc_stop_streaming(devh);
