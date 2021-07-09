@@ -27,6 +27,7 @@
 		F122C31A2697925F00A199D1 /* uvc-camera */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "uvc-camera"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F122C31D2697925F00A199D1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F191B4E52697C80B007B97D7 /* libuvc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuvc.a; path = ../../../../../usr/local/lib/libuvc.a; sourceTree = "<group>"; };
+		F1EA25DC2698C4510062F04F /* uvc-camera.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "uvc-camera.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +62,7 @@
 		F122C31C2697925F00A199D1 /* uvc-camera */ = {
 			isa = PBXGroup;
 			children = (
+				F1EA25DC2698C4510062F04F /* uvc-camera.entitlements */,
 				F122C31D2697925F00A199D1 /* main.cpp */,
 			);
 			path = "uvc-camera";
@@ -266,6 +268,7 @@
 		F122C3222697925F00A199D1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "uvc-camera/uvc-camera.entitlements";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = NC5A977249;
@@ -273,6 +276,7 @@
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.canon.cusa.uvc-camera";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WARNING_LDFLAGS = "";
@@ -282,6 +286,7 @@
 		F122C3232697925F00A199D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "uvc-camera/uvc-camera.entitlements";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = NC5A977249;
@@ -289,6 +294,7 @@
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.canon.cusa.uvc-camera";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WARNING_LDFLAGS = "";
