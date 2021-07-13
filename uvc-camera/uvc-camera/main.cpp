@@ -24,6 +24,36 @@
 //#include <opencv2/core/types_c.h>
 //#include <opencv2/highgui/highgui_c.h>
 
+void saveFrame(size_t numYuvBytes, int sequenceNum, uvc_frame_t *bgr) { //numYuvBytes is just used to display the number of YUV bytes
+    // Use Brad's image class to save a single frame
+    MyImage im(640, 480);
+    BYTE *pData = im.grabWrite();
+    
+    // Process one frame
+    memset(pData, 0, im.getInfo().size.h + im.getInfo().size.w + im.getInfo().BPP);
+    std::cout << "Buffer size = " + std::to_string(im.getInfo().size.h * im.getInfo().size.w * im.getInfo().BPP) << std::endl;
+    std::cout << "frame->data_bytes = " + std::to_string(numYuvBytes) << " This is a YUV buffer" << std::endl;
+    std::cout << "bgr->data_bytes = " + std::to_string(bgr->data_bytes)  << " This is an RGB buffer" << std::endl;
+    std::cout << "h,w,bpp = " + std::to_string(im.getInfo().size.h) << ", " << std::to_string(im.getInfo().size.w) << ", " << std::to_string(im.getInfo().BPP) << std::endl;
+    
+    for (int row = 0 ; row < im.getInfo().size.h ; row++) {     // rows from bottom
+        int destRow = im.getInfo().size.h - 1 - row;            // Opposite direction for flipping the image
+        for (int col = 0 ; col < im.getInfo().size.w ; col++) { // columns from left
+            for (int rgb = 0; rgb < im.getInfo().BPP; rgb++) {  // R,G,B
+                //pData[j*im.getInfo().stride + i * im.getInfo().BPP + c] = myImagebyte;
+                pData[destRow * im.getInfo().stride + col * im.getInfo().BPP + rgb] = *((char *)bgr->data
+                                                                                        + (row * im.getInfo().size.w * im.getInfo().BPP) // Offset to the row
+                                                                                        + (col * im.getInfo().BPP)                       // Offset to the column
+                                                                                        + rgb);                                          // Offset to the byte
+            }
+        }
+    }
+    
+    im.release(pData);
+    std::string filename = "frame_" + std::to_string(sequenceNum) + ".bmp";
+    im.Save(filename.c_str());
+}
+
 /* This callback function runs once per frame. Use it to perform any
  * quick processing you need, or have it put the frame into your application's
  * input queue. If this function takes too long, you'll start losing frames. */
@@ -36,7 +66,7 @@ void cb(uvc_frame_t *frame, void *ptr) {
      * static const char *H264_FILE = "iOSDevLog.h264";
      * static const char *MJPEG_FILE = ".jpeg";
      * char filename[16]; */
-    
+
     /* We'll convert the image from YUV/JPEG to BGR, so allocate space */
     bgr = uvc_allocate_frame(frame->width * frame->height * 3);
     if (!bgr) {
@@ -85,34 +115,9 @@ void cb(uvc_frame_t *frame, void *ptr) {
         printf(" * got image %u\n",  frame->sequence);
     }
     
-    // Use Brad's function to save a single frame
-    MyImage im(640, 480);
-    BYTE *pData = im.grabWrite();
-    
-    // Process one frame
-    memset(pData, 0, im.getInfo().size.h + im.getInfo().size.w + im.getInfo().BPP);
-    std::cout << "Buffer size = " + std::to_string(im.getInfo().size.h * im.getInfo().size.w * im.getInfo().BPP) << std::endl;
-    std::cout << "frame->data_bytes = " + std::to_string(frame->data_bytes) << " This is a YUV buffer" << std::endl;
-    std::cout << "bgr->data_bytes = " + std::to_string(bgr->data_bytes)  << " This is an RGB buffer" << std::endl;
-    std::cout << "h,w,bpp = " + std::to_string(im.getInfo().size.h) << ", " << std::to_string(im.getInfo().size.w) << ", " << std::to_string(im.getInfo().BPP) << std::endl;
-    
-    for (int row = 0 ; row < im.getInfo().size.h ; row++) {     // rows from bottom
-        int destRow = im.getInfo().size.h - 1 - row;            // Opposite direction for flipping the image
-        for (int col = 0 ; col < im.getInfo().size.w ; col++) { // columns from left
-            for (int rgb = 0; rgb < im.getInfo().BPP; rgb++) {  // R,G,B
-                //pData[j*im.getInfo().stride + i * im.getInfo().BPP + c] = myImagebyte;
-                pData[destRow * im.getInfo().stride + col * im.getInfo().BPP + rgb] = *((char *)bgr->data
-                                                                                        + (row * im.getInfo().size.w * im.getInfo().BPP) // Offset to the row
-                                                                                        + (col * im.getInfo().BPP)                       // Offset to the column
-                                                                                        + rgb);                                          // Offset to the byte
-            }
-        }
-    }
-    
-    im.release(pData);
-    std::string filename = "frame_" + std::to_string(frame->sequence) + ".bmp";
-    im.Save(filename.c_str());
-    
+    // Save a single frame
+    saveFrame(frame->data_bytes, frame->sequence, bgr); // data_bytes is just used to display the number of YUV bytes
+        
     /* Call a user function:
      *
      * my_type *my_obj = (*my_type) ptr;
@@ -336,4 +341,3 @@ int main(int argc, char **argv) {
     
     return 0;
 }
-
