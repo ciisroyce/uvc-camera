@@ -16,7 +16,6 @@
 #include "BmpInfo.h"
 #include "IImageBuffer.h"
 #include <iostream>
-
 //#include <opencv2/opencv.hpp>
 //#include <opencv2/highgui.hpp>
 //#include <opencv2/core.hpp>
@@ -203,7 +202,7 @@ void enumerateCameras(uvc_context_t *ctx) {
             int busNum = uvc_get_bus_number (dev);
             std::cout << "Camera " << i <<  " is connected to bus " << busNum << std::endl;
 
-uvc_free_device_descriptor(desc);
+            uvc_free_device_descriptor(desc);
             i++;
         }
         else {
@@ -211,7 +210,47 @@ uvc_free_device_descriptor(desc);
             continue;
         }
     }
+    std::cout << "End of list. Total cameras found: " << i << std::endl;
     uvc_free_device_list(list, (unsigned char)0);
+}
+
+void searchCameras(uvc_context_t *ctx, int vendorId, int productId, const char *serialNumber) {
+    uvc_error_t res;
+    uvc_device_t *dev;
+    uvc_device_descriptor_t *desc = nullptr;
+
+    uvc_device_t **list = nullptr;
+    res = uvc_find_device(ctx, &dev, vendorId, productId, serialNumber);
+    if (res != UVC_SUCCESS) {
+        std::string error;
+        switch (res) {
+            case UVC_ERROR_NO_DEVICE :
+                error = "UVC_ERROR_NO_DEVICE";
+                break;
+            default :
+                error = std::to_string(res);
+        }
+        
+        std::cout << "No device found. Response: " << error << std::endl;
+//        uvc_exit(ctx);
+//      exit(1);
+    }
+    
+    else {
+        std::cout << "The following matching camera was found:" << std::endl;
+        int i = 0;
+        if (uvc_get_device_descriptor(dev, &desc) == UVC_SUCCESS) {
+            dumpDeviceDescriptor(dev, desc);
+            
+            // Find the bus number to which the device is connected
+            int busNum = uvc_get_bus_number (dev);
+            std::cout << "The camera is connected to bus " << busNum << std::endl;
+            
+            uvc_free_device_descriptor(desc);
+        }
+        else {
+        }
+    }
 }
 
 int main(int argc, char **argv) {
@@ -220,9 +259,7 @@ int main(int argc, char **argv) {
     uvc_device_handle_t *devh;
     uvc_stream_ctrl_t ctrl;
     uvc_error_t res;
-    uvc_device_descriptor_t *desc = nullptr;
-    int busNum = 0;
-
+    
     /* Initialize a UVC service context. Libuvc will set up its own libusb
      * context. Replace NULL with a libusb_context pointer to run libuvc
      * from an existing libusb context. */
@@ -234,13 +271,34 @@ int main(int argc, char **argv) {
     }
     
     puts("UVC initialized");
+    puts("Press ENTER to find all cameras...");
+    getchar();
     
     // ================================================================
     //                       Test Camera Enumeration
     // ================================================================
 
-    std::cout << std::endl << "Looking for connected cameras..." << std::endl;
+    std::cout << "Looking for all connected cameras..." << std::endl;
     enumerateCameras(ctx); // This just finds all cameras and dumps the descriptions
+    puts("\nPress ENTER to find a specific camera...");
+    getchar();
+
+    // ================================================================
+    //                       Test Camera Search
+    // ================================================================
+
+    // What to search for
+    int vendorId = 1133;
+    int ProductId = 2113;
+    const char *serialNumber = "4264D46F";
+    
+    std::cout << "Searching for a specific camera using the following criteria:" << std::endl;
+    std::cout << "vendorId = " << vendorId << std::endl;
+    std::cout << "productId = " << ProductId << std::endl;
+    std::cout << "serialNumber = " << serialNumber << std::endl;
+    searchCameras(ctx, vendorId, ProductId, serialNumber); // This just finds all cameras with the designated string in the Product field
+    puts("\nPress ENTER to capture video stream for 5 seconds...");
+    getchar();
 
     // ================================================================
     
@@ -343,7 +401,7 @@ int main(int argc, char **argv) {
                         uvc_perror(res, " ... uvc_set_ae_mode failed to enable auto exposure mode");
                     }
                     
-                    sleep(1); /* stream for 1 second */
+                    sleep(5); /* stream for 5 seconds */
                     
                     /* End the stream. Blocks until last callback is serviced */
                     uvc_stop_streaming(devh);
