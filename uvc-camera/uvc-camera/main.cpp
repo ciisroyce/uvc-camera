@@ -152,7 +152,6 @@ void cb(uvc_frame_t *frame, void *ptr) {
 
 void dumpDeviceDescriptor(uvc_device_t *dev, uvc_device_descriptor_t *desc) {
     uvc_get_device_descriptor(dev, &desc);
-    std::cout << "The following items were included in the device description: " << std::endl;
     // Product
     std::cout << "   Product: " << desc->product << std::endl;
     
@@ -180,6 +179,41 @@ void dumpDeviceDescriptor(uvc_device_t *dev, uvc_device_descriptor_t *desc) {
     std::cout << "   Serial Number: " << desc->serialNumber << std::endl;
 }
 
+void enumerateCameras(uvc_context_t *ctx) {
+    uvc_error_t res;
+    uvc_device_t *dev;
+    uvc_device_descriptor_t *desc = nullptr;
+
+    uvc_device_t **list = nullptr;
+    res = uvc_get_device_list(ctx, &list);
+    if (res != UVC_SUCCESS) {
+      uvc_exit(ctx);
+      exit(1);
+    }
+
+    std::cout << "The following cameras were found:" << std::endl;
+    int i = 0;
+    while (list[i] != NULL) {
+        dev = list[i];
+        if (uvc_get_device_descriptor(dev, &desc) == UVC_SUCCESS) {
+            std::cout << "Camera " << i << ":" << std::endl;
+            dumpDeviceDescriptor(list[i], desc);
+            
+            // Find the bus number to which the device is connected
+            int busNum = uvc_get_bus_number (dev);
+            std::cout << "Camera " << i <<  " is connected to bus " << busNum << std::endl;
+
+uvc_free_device_descriptor(desc);
+            i++;
+        }
+        else {
+            i++;
+            continue;
+        }
+    }
+    uvc_free_device_list(list, (unsigned char)0);
+}
+
 int main(int argc, char **argv) {
     uvc_context_t *ctx;
     uvc_device_t *dev;
@@ -188,7 +222,6 @@ int main(int argc, char **argv) {
     uvc_error_t res;
     uvc_device_descriptor_t *desc = nullptr;
     int busNum = 0;
-    uvc_device_t **list = nullptr;
 
     /* Initialize a UVC service context. Libuvc will set up its own libusb
      * context. Replace NULL with a libusb_context pointer to run libuvc
@@ -202,18 +235,16 @@ int main(int argc, char **argv) {
     
     puts("UVC initialized");
     
-    // TODO: Running this list code stops the camera from properly starting streaming
-//    res = uvc_get_device_list(ctx, &list);
-//    std::cout << "Accessing the the list ..." << std::endl; // TODO: How do we know how many items are in the list???
-//    for(int i = 0; i < 1; i++) {
-//        res = uvc_open(list[i], &devh);
-//        uvc_close(devh);
-//    }
-//    unsigned char x = 0;
-//    uvc_free_device_list(list, x);
+    // ================================================================
+    //                       Test Camera Enumeration
+    // ================================================================
+
+    std::cout << std::endl << "Looking for connected cameras..." << std::endl;
+    enumerateCameras(ctx); // This just finds all cameras and dumps the descriptions
+
+    // ================================================================
     
-    /* Locates the first attached UVC device, stores in dev */
-    std::cout << "Locating the first attached UVC device..." << std::endl;
+    std::cout << std::endl << "Locating the first attached UVC device..." << std::endl;
     res = uvc_find_device(ctx, &dev, 0, 0, NULL); // filter devices by vendor_id, product_id, "serial_num"
         if (res < 0) {
         uvc_perror(res, "uvc_find_device");
@@ -223,16 +254,11 @@ int main(int argc, char **argv) {
     } else {
         puts("Device found");
         
-        // Find the bus number to which the device is connected
-        busNum = uvc_get_bus_number (dev);
-        std::cout << "The device is connected to bus number: " << busNum << std::endl;
-
-        // Print out the contents of the device descriptory
-        dumpDeviceDescriptor(dev, desc);
-
         /* Try to open the device: requires exclusive access */
         std::cout << "Opening the device..." << std::endl;
         
+        // The folowing instruction gets a warning:
+        // "unsupported descriptor subtype VS_COLORFORMAT"
         res = uvc_open(dev, &devh);
         if (res < 0) {
             uvc_perror(res, "uvc_open");

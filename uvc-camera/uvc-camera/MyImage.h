@@ -73,7 +73,7 @@ public:
 		unsigned int bpp = info.BPP;
 
 		generateBitmapImage(pData, height, width, imageFileName);
-		std::cout << imageFileName << "  Image generated!!\n";
+		std::cout << "Image saved to " << imageFileName << "\n";
 	}
 
 	void generateBitmapImage(unsigned char* image, int height, int width, const char* imageFileName)
